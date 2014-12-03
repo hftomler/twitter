@@ -1,0 +1,30 @@
+HACER UN TWITTER
+
+USUARIOS
+  - LOGIN 
+  - LOGOUT
+  - TIMELINE
+    - TWEETS
+      - MENSAJE
+      - FECHA - HORA
+    - PAGINACIÓN.
+
+
+BD TWITTER
+
+  - USUARIOS:
+    -create table usuarios (
+      id       bigserial   constraint pk_usuarios primary key,
+      nick     varchar(15) not null constraint uq_usuarios_nick unique,
+      password char(32)    not null constraint ck_password_valida
+                         check (length(password) = 32));
+
+  - TWEETS:
+    - create tabla tweets (
+      id          bigserial    constraint pk_tweets primary key,
+      id_usuario  bigint       not null constraint fk_tweets_usuarios
+                               references usuarios (id) on delete no action
+                               on update cascade,
+      mensaje     varchar(160) not null constraint ck_tweets_mensaje
+                               check (length(mensaje) = 160),
+      fecha       fecha        date not null default CURRENT_DATE));
