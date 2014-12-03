@@ -9,9 +9,12 @@
   <body><?php
     require '../comunes/auxiliar.php';
 
+     // Recibe el usuario o redirige a login.
+      $usuario_id = comprobar_usuario();
+      $nick = comprobar_nick($usuario_id);
+
     // COMPROBACIONES DE DATOS RECIBIDOS POR POST
 
-    $usuario_id= (isset($_POST['usuario_id']) ? $_POST['usuario_id'] : '');
     $pag = (isset($_POST['pag'])? trim($_POST['pag']): 1);
 
     if (isset($_POST['insertar_tuit'])) {
@@ -26,33 +29,47 @@
       modificar_tuit($_POST['tuit_id'], $_POST['mensaje_mod']);
     }
 
-    // VARIABLES PARA PAGINACIÓN
+    if (isset($_GEt['ver_user'])) {
+      $usuario_id = (isset($_GET['ouser_id'])) ? trim($_GET['ouser_id']) : $usuario_id;
+    }
 
-    if ($usuario_id != '') {
-
-    }?>
+    // VARIABLES PARA PAGINACIÓN ?>
 
     <div id="principal">
       <header>
       </header>
       <aside>
-        <form action="index.php" method="POST">
+        <div class="leyenda">
           Usuario:
-          <input  type="number" width="15" name="usuario_id"
-                  min="<?= usuario_min() ?>" max="<?= usuario_max() ?>" value="<?= $usuario_id ?>"
-                  placeholder="Valor entre <?= usuario_min() ?> y <?= usuario_max() ?>"><br/>
-          <input type="submit" name="enviar" title="Enviar">
-        </form><?php
-
-        if ($usuario_id !='') { // HAY UN USUARIO IDENTIFICADO EN EL SISTEMA?>
+        </div>
+        <div class="dato">
+          <?= $usuario_id ?>
+        </div>
+        <div class="icono">
+          <a href="../usuarios/logout.php">
+            <img src="../images/logout.png" title="Logout" alt="Logout" />
+          </a>
+        </div>
+        <div class="leyenda">
+          Nick:
+        </div>
+        <div class="dato">
+          <?= $nick ?>
+        </div>
           <form action="index.php" method="POST">
             <input type="hidden" name="usuario_id" value="<?= $usuario_id ?>">
             <textarea class="enviar_msj" name="insertar_tuit" rows="8" cols="22" 
             maxlength="140" placeholder="Introduzca el mensaje (máx. 140 carácteres)"
             required="required"></textarea>
             <input type="submit" value="Enviar">
-          </form><?php
-        }?>
+          </form>
+        <form action="index.php" method="GET">
+          Usuario
+          <input  type="number" width="15" name="ouser_id"
+                  min="<?= usuario_min() ?>" max="<?= usuario_max() ?>" 
+                  placeholder="Valor entre <?= usuario_min() ?> y <?= usuario_max() ?>"><br/>
+          <input type="submit" name="ver_user" value="Ver Timeline">
+        </form>
       </aside>
       <section><?php
         if ($usuario_id !='' && (!isset($_POST['editar_msj']))) {
@@ -114,8 +131,8 @@
                 <form action="index.php" method="POST">
                     <input type="hidden" name="tuit_id" value="<?= $id ?>">
                     <input type="hidden" name="usuario_id" value="<?= $usuario_id ?>">
-                    <textarea class="enviar_msj" name="mensaje_mod" rows="8" cols="22" 
-                    maxlength="140" ><?= $mensaje ?></textarea>
+                    <textarea class="editar_msj" name="mensaje_mod" rows="4" 
+                    maxlength="140" ><?= $mensaje ?></textarea><br/>
                     <input type="submit" name="modificar_tuit" value="Guardar">
                 </form><?php
               }

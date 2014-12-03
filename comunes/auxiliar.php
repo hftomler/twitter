@@ -12,10 +12,30 @@
   {
     if (!isset($_SESSION['usuario'])) {
       $_SESSION['url'] = $_SERVER["REQUEST_URI"];
-      header("Location: /tienda/usuarios/login.php");
+      header("Location: ../usuarios/login.php");
     }
     return $_SESSION['usuario'];
   }
+
+  function comprobar_nick($id) {
+    $con = conectar();
+
+    $res = pg_query($con, "select nick from usuarios where id::text = '$id'");
+
+    if (pg_num_rows($res) == 1) {
+      $fila = pg_fetch_assoc($res);
+      $nick = $fila['nick'];
+    }
+
+    pg_close();
+
+    if (isset($nick)) {
+      return $nick; 
+    } else {
+      $_SESSION['url'] = $_SERVER["REQUEST_URI"];
+      header("Location: ../usuarios/login.php");
+    }
+  }  
 
   function usuario_max() {
     
@@ -165,7 +185,6 @@
       $fin = $npag;
       $inicio = $fin-($nenlaces*2);
       $inicio = ($inicio<1) ? $inicio = 1 : $inicio;
-
     }
     for ($i=$inicio; $i <= $fin; $i++) {?>
         <form class="pag" action="index.php" method = "POST">

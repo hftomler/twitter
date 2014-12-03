@@ -68,9 +68,18 @@ footer {
 }
 
 textarea.enviar_msj {
- resize:none;
- font-size: 0.9em;
- width: 200px;
+  resize:none;
+  font-size: 0.9em;
+  width: 200px;
+}
+
+textarea.editar_msj {
+  resize:none;
+  width: 500px;
+  padding: 5px;
+  border-radius: 5px 5px;
+  box-shadow: #666 2px 2px 4px;
+  font-size: 1.1em;
 }
 
 input[type=number] {
@@ -84,6 +93,31 @@ form * {
 form.pag {
   display: inline;
 }
+
+.leyenda {
+  float: left;
+  width: 50px;
+  margin: 5px 5px;
+  color: #960 ;
+  text-align: left;
+}
+
+.dato {
+  float: left;
+  width: 100px;
+  margin: 5px 5px;
+  color: #00f;
+  text-align: left;
+}
+
+.icono {
+  float: left;
+  width: 36px;
+  height: 36px;
+}
+
+
+/* INPUT PAGINACIÓN */
 
 
 input.pg {
@@ -124,6 +158,9 @@ input.pg_anterior {
   height: 36px;
   width: 83px;
 }
+/* FIN INPUT PAGINACIÓN */
+
+
 
 /* FORMATOS DE PÁRRAFO */
 
@@ -147,6 +184,15 @@ input.pg_anterior {
   padding: 0 10px;
 }
 
+.indentado {
+  text-indent: 50px;
+  text-align: left;
+}
+
+.resaltar {
+  color: blue;
+  font-weight: bold;
+}
 
 
 /* DISEÑO DE TABLA */
