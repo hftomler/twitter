@@ -29,7 +29,15 @@ header {
   margin: 5px auto;
   padding: 0px 5px 0 5px;
   text-align: right;
-  background-image: url("../images/header.jpg");
+  background-image: url("../images/header.png");
+}
+
+.login {
+  display: block;
+  float: right;
+  padding: 10px;
+  width: 350px;
+  text-align: right;
 }
 
 section {
@@ -56,6 +64,10 @@ aside {
   margin: 5px 5px 5px 0;
   padding: 5px;
   text-align: center;
+}
+
+.rotulo {
+  margin: 10px 0;
 }
 
 footer {
@@ -164,6 +176,12 @@ input.pg_anterior {
 
 /* FORMATOS DE PÁRRAFO */
 
+.titulo {
+  text-align: center;
+  color: #06c;
+  font: bold 1.2em verdana, sans-serif;
+}
+
 .derecha {
   text-align: right;
   padding: 0 10px;
@@ -192,6 +210,20 @@ input.pg_anterior {
 .resaltar {
   color: blue;
   font-weight: bold;
+}
+
+.copyright {
+  color: #fff;
+  text-align: center;
+  font-size: 0.6em;
+  font-weight: 200;
+}
+
+footer p {
+  color: #fff;
+  text-align: center;
+  font-size: 0.6em;
+  font-weight: 200;
 }
 
 

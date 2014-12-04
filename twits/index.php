@@ -9,9 +9,17 @@
   <body><?php
     require '../comunes/auxiliar.php';
 
-     // Recibe el usuario o redirige a login.
-      $usuario_id = comprobar_usuario();
-      $nick = comprobar_nick($usuario_id);
+     // Recibe el usuario logueado o redirige a login.
+ 
+      if (isset($_SESSION['usuario'])) {
+        $logged_id = $_SESSION['usuario'];
+      } else {
+        $logged_id = comprobar_usuario();
+      }
+
+      $usuario_id = (isset($_POST['usuario_id']))? trim($_POST['usuario_id']): $logged_id;
+      $nick = comprobar_nick($logged_id);
+      $mensaje = (isset($_POST['mensaje']))? trim($_POST['mensaje']): '';
 
     // COMPROBACIONES DE DATOS RECIBIDOS POR POST
 
@@ -29,26 +37,22 @@
       modificar_tuit($_POST['tuit_id'], $_POST['mensaje_mod']);
     }
 
-    if (isset($_GEt['ver_user'])) {
-      $usuario_id = (isset($_GET['ouser_id'])) ? trim($_GET['ouser_id']) : $usuario_id;
+    if (isset($_GET['ver_user'], $_GET['ouser_id']) && $_GET['ouser_id'] !='') {
+      $usuario_id = $_GET['ouser_id'];
     }
+
 
     // VARIABLES PARA PAGINACIÓN ?>
 
-    <div id="principal">
-      <header>
-      </header>
+    <div id="principal"><?php
+      include('../comunes/header.php');?>
       <aside>
+        <img class="rotulo" src="../images/logged.png" />
         <div class="leyenda">
           Usuario:
         </div>
         <div class="dato">
-          <?= $usuario_id ?>
-        </div>
-        <div class="icono">
-          <a href="../usuarios/logout.php">
-            <img src="../images/logout.png" title="Logout" alt="Logout" />
-          </a>
+          <?= $logged_id ?>
         </div>
         <div class="leyenda">
           Nick:
@@ -60,14 +64,17 @@
             <input type="hidden" name="usuario_id" value="<?= $usuario_id ?>">
             <textarea class="enviar_msj" name="insertar_tuit" rows="8" cols="22" 
             maxlength="140" placeholder="Introduzca el mensaje (máx. 140 carácteres)"
-            required="required"></textarea>
+            required="required"><?= $mensaje ?></textarea>
             <input type="submit" value="Enviar">
           </form>
+
+        <img class="rotulo" src="../images/timeline.png" />
         <form action="index.php" method="GET">
           Usuario
           <input  type="number" width="15" name="ouser_id"
                   min="<?= usuario_min() ?>" max="<?= usuario_max() ?>" 
-                  placeholder="Valor entre <?= usuario_min() ?> y <?= usuario_max() ?>"><br/>
+                  placeholder="Valor entre <?= usuario_min() ?> y <?= usuario_max() ?>"
+                  title="Dejar vacío para timeline de <?= comprobar_nick($logged_id) ?>"><br/>
           <input type="submit" name="ver_user" value="Ver Timeline">
         </form>
       </aside>
@@ -101,17 +108,24 @@
                       <td class="id"><?= $id ?></td>
                       <td class="justificado mensaje"><?= $mensaje ?></td>
                       <td class="fecha"><?= $fecha_formateada ?></td>
-                      <td class="accion">
-                        <form style="display:inline" action="index.php" method="POST">
-                          <input type="hidden" name="tuit_id" value="<?= $id ?>">
-                          <input type="hidden" name="usuario_id" value="<?= $usuario_id ?>">
-                          <input type="submit" name="borrar_tuit" value="Borrar">
-                        </form>
-                        <form style="display:inline" action="index.php" method="POST">
-                          <input type="hidden" name="tuit_id" value="<?= $id ?>">
-                          <input type="hidden" name="usuario_id" value="<?= $usuario_id ?>">
-                          <input type="submit" name="editar_msj" value="Editar">
-                        </form>
+                      <td class="accion"><?php 
+                        if ($logged_id == $usuario_id) {?>
+                          <form style="display:inline" action="index.php" method="POST">
+                            <input type="hidden" name="tuit_id" value="<?= $id ?>">
+                            <input type="hidden" name="usuario_id" value="<?= $usuario_id ?>">
+                            <input type="submit" name="borrar_tuit" value="Borrar">
+                          </form>
+                          <form style="display:inline" action="index.php" method="POST">
+                            <input type="hidden" name="tuit_id" value="<?= $id ?>">
+                            <input type="hidden" name="usuario_id" value="<?= $usuario_id ?>">
+                            <input type="submit" name="editar_msj" value="Editar">
+                          </form><?php
+                        } else {?>
+                          <form style="display:inline" action="index.php" method="POST">
+                            <input type="hidden" name="mensaje" value="<?= $mensaje ?>">
+                            <input type="submit" name="retuitear" value="Retuit">
+                          </form><?php
+                        }?>
                       </td>
                     </tr><?php
                   }?>
@@ -138,9 +152,8 @@
               }
             }
         }?>
-      </section>
-      <footer>
-      </footer>
+      </section><?php
+      include('../comunes/footer.php');?>
     </div>
   </body>
 </html>
