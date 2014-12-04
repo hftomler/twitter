@@ -48,7 +48,7 @@
     <div id="principal"><?php
       include('../comunes/header.php');?>
       <aside>
-        <img class="rotulo" src="../images/logged.png" />
+        <h3>Logged User</h3>
         <div class="leyenda">
           Usuario:
         </div>
@@ -68,16 +68,17 @@
             required="required"><?= $mensaje ?></textarea>
             <input type="submit" value="Enviar">
           </form>
-        <img src="../images/divider.png" />
-        <img class="rotulo" src="../images/timeline.png" />
-        <form action="index.php" method="GET">
-          Usuario
-          <input  type="number" width="15" name="ouser_id"
-                  min="<?= usuario_min() ?>" max="<?= usuario_max() ?>" 
-                  placeholder="Valor entre <?= usuario_min() ?> y <?= usuario_max() ?>"
-                  title="Dejar vacío para timeline de <?= comprobar_nick($logged_id) ?>"><br/>
-          <input type="submit" name="ver_user" value="Ver Timeline">
-        </form>
+          <br />
+          <img src="../images/divider.png" />
+          <h3>Ver Timeline ajeno</h3>
+          <form action="index.php" method="GET">
+            Usuario
+            <input  type="number" width="15" name="ouser_id"
+                    min="<?= usuario_min() ?>" max="<?= usuario_max() ?>" 
+                    placeholder="Valor entre <?= usuario_min() ?> y <?= usuario_max() ?>"
+                    title="Dejar vacío para timeline de <?= comprobar_nick($logged_id) ?>"><br/>
+            <input type="submit" name="ver_user" value="Ver Timeline">
+          </form>
       </aside>
       <section><?php
         if ($usuario_id !='' && (!isset($_POST['editar_msj']))) {

@@ -15,6 +15,9 @@ create table tuits (
       usuario_id  bigint       not null constraint fk_tuits_usuarios
                                references usuarios (id) on delete cascade
                                on update cascade,
+      from_id     bigint       constraint fk_retuit_usuarios
+                               references usuarios (id) on delete null
+                               on update cascade,
       mensaje     varchar(140) not null constraint ck_tuits_mensaje
                                check (length(mensaje) <= 140),
       fecha       timestamp    not null default current_timestamp);
