@@ -26,7 +26,8 @@
     $pag = (isset($_POST['pag'])? trim($_POST['pag']): 1);
 
     if (isset($_POST['insertar_tuit'])) {
-      insertar_tuit($_POST['insertar_tuit'], $usuario_id);
+      insertar_tuit($_POST['insertar_tuit'], $logged_id);
+      $usuario_id = $logged_id;
     }
 
     if (isset($_POST['borrar_tuit'], $_POST['tuit_id'])) {
@@ -67,7 +68,7 @@
             required="required"><?= $mensaje ?></textarea>
             <input type="submit" value="Enviar">
           </form>
-
+        <img src="../images/divider.png" />
         <img class="rotulo" src="../images/timeline.png" />
         <form action="index.php" method="GET">
           Usuario
@@ -123,6 +124,7 @@
                         } else {?>
                           <form style="display:inline" action="index.php" method="POST">
                             <input type="hidden" name="mensaje" value="<?= $mensaje ?>">
+                            <input type="hidden" name="usuario_id" value="<?= $usuario_id ?>">
                             <input type="submit" name="retuitear" value="Retuit">
                           </form><?php
                         }?>
