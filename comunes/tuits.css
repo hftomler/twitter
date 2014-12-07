@@ -95,9 +95,16 @@ section {
 
 .res1, .res2 {
   position: relative;
-  width: 475px;
-  background: blue;
+  width: 462px;
+  background: #fff url("../images/res_watermark.png") no-repeat center center;
+}
 
+.res1 {
+  margin: 5px 0;
+}
+
+.res2 {
+  margin: 5px 0 5px 10px;
 }
 
 .cont_paginacion {

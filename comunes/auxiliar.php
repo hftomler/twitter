@@ -45,26 +45,6 @@
     }
   }
 
-/*  function comprobar_nick($id) {
-    $con = conectar();
-
-    $res = pg_query($con, "select nick from usuarios where id::text = '$id'");
-
-    if (pg_num_rows($res) == 1) {
-      $fila = pg_fetch_assoc($res);
-      $nick = $fila['nick'];
-    }
-
-    pg_close();
-
-    if (isset($nick)) {
-      return $nick; 
-    } else {
-      $_SESSION['url'] = $_SERVER["REQUEST_URI"];
-      header("Location: ../usuarios/login.php");
-    }
-  }  */
-
   function usuario_max() {
     
     $max = 0; 
@@ -138,7 +118,11 @@
 
   function contar_tuits($usuario) {
     $con = conectar();
-    $res = pg_query($con, "select count(*) as ntuits from tuits where usuario_id::text = '$usuario'");  
+    if ($usuario == 0) {
+      $res = pg_query($con, "select count(*) as ntuits from tuits");  
+    } else {
+      $res = pg_query($con, "select count(*) as ntuits from tuits where usuario_id::text = '$usuario'");
+    }
     if (pg_affected_rows($res) == 1) {
       $fila = pg_fetch_assoc($res);
       $ntuits = $fila['ntuits'];
@@ -162,10 +146,14 @@
     return $res;
   }
 
-  function devolver_tuit($id) {
+  function devolver_ntuits($ntuits_dev) {
+    $ntuits = contar_tuits(0);
     $con = conectar();
-    $res = pg_query($con, "select id, mensaje, to_char(fecha, 'dd-mm-yyyy\" a las \"HH24:MI:SS') as fecha_formateada
-                           from tuits where id::text = '$id'");
+    $res = pg_query($con, "select id, mensaje, from_id, to_char(fecha, '\"<b>\"dd-mm-yyyy\"</b>
+                                               <br/><b>Hora:</b> \"HH24:MI') as fecha_formateada
+                                  from tuits 
+                           order by fecha desc
+                           limit $ntuits_dev");
     pg_close();
 
     return $res;

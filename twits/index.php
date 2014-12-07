@@ -179,7 +179,50 @@
             <span class="numero_tuits">(<?= contar_tuits($id) ?>)</span></a></span><br/><?php
           }
         }?>
-      </aside><?php
+      </aside>
+      <section class="res1"><?php
+        $ntuits_dev = 6;
+        $last_tuits = devolver_ntuits($ntuits_dev);
+        if (pg_affected_rows($last_tuits) >0) { // SI EXISTEN TUITS DIBUJO LA TABLA CON ELLOS ?>
+          <table>
+            <thead>
+              <tr>
+                <th colspan="3">ÚLTIMOS <?= $ntuits_dev ?> tuits en JATAS</th>
+              </tr>
+              <tr>
+                <th width="60%">MENSAJE</th>
+                <th width="14%">FECHA</th>
+                <th width="10%">RETUIT</th>
+              </tr>
+            </thead>
+            <tbody><?php
+                for ($i = 0; $i < pg_num_rows($last_tuits); $i++) {
+                  $fila = pg_fetch_assoc($last_tuits, $i);
+                  extract($fila);?>
+                  <tr class="mensajes">
+                    <td class="justificado mensaje"><?php 
+                      if (!(is_null($from_id))) {?>
+                        <span class="resaltar">@<a href="index.php?ouser_id=<?=$from_id ?>&ver_user"><?= devolver_from_nick($from_id) ?></a> - </span><?php
+                      }?><?= $mensaje ?>
+                    </td>
+                    <td class="fecha"><?= $fecha_formateada ?></td>
+                    <td class="accion">
+                        <form style="display:inline" action="index.php" method="POST">
+                          <input type="hidden" name="mensaje" value="<?= $mensaje ?>">
+                          <input type="hidden" name="usuario_id" value="<?= $usuario_id ?>">
+                          <input type="image" src="../images/retuit_icon.png" name="retuitear" title="Retuitear">
+                        </form>
+                    </td>
+                  </tr><?php
+                }?>
+            </tbody>
+          </table><?php
+        }?>
+      </section>
+      <section class="res2">
+        <h3 class="titulo">Usuarios más activos</h3>
+      </section>
+      <?php
       include('../comunes/footer.php');?>
     </div>
   </body>
