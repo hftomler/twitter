@@ -17,7 +17,35 @@
     return $_SESSION['usuario'];
   }
 
-  function comprobar_nick($id) {
+  function existe_nick($nick) {
+    $con = conectar();
+
+    $res = pg_query($con, "select id from usuarios
+                           where nick = '$nick'");
+
+    if (pg_num_rows($res) == 1) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  function devolver_id($nick) {
+    if (existe_nick($nick)) {
+      $con = conectar();
+      $res = pg_query($con, "select id from usuarios
+                           where nick = '$nick'");
+
+      if (pg_num_rows($res) == 1) {
+        $fila = pg_fetch_assoc($res);
+        return $fila['id'];
+      }
+    } else {
+      return false;
+    }
+  }
+
+/*  function comprobar_nick($id) {
     $con = conectar();
 
     $res = pg_query($con, "select nick from usuarios where id::text = '$id'");
@@ -35,7 +63,7 @@
       $_SESSION['url'] = $_SERVER["REQUEST_URI"];
       header("Location: ../usuarios/login.php");
     }
-  }  
+  }  */
 
   function usuario_max() {
     
@@ -79,7 +107,31 @@
     }
 
     pg_close();
+    return $nick;
+  }
+
+  function devolver_from_nick($from_id) { // Devuelve el nick del usuario original del tuit
+    $con = conectar();
+
+    $res = pg_query($con, "select nick from usuarios where id::text = '$from_id'");
+
+    if (pg_affected_rows($res) == 1) {
+      $fila = pg_fetch_assoc($res);
+      $nick = $fila['nick'];
+    }
+
+    pg_close();
     return $nick; 
+  }
+
+  function devolver_lista_usuarios($usuario_id) { // Devuelve todos los usuarios excepto el usuario
+                                                 // del que se está mostrando el timeline actualmente
+    $con = conectar();
+
+    $res = pg_query($con, "select nick, id from usuarios where id::text != '$usuario_id'");
+
+    pg_close();
+    return $res; 
   }
 
 // FUNCIONES RELACIONADAS CON LOS TUITS
@@ -98,7 +150,7 @@
 
   function devolver_tuits($usuario_id, $tpp, $pag) {
     $con = conectar();
-    $res = pg_query($con, "select id, mensaje, to_char(fecha, '\"<b>\"dd-mm-yyyy\"</b>
+    $res = pg_query($con, "select id, mensaje, from_id, to_char(fecha, '\"<b>\"dd-mm-yyyy\"</b>
                                                <br/><b>Hora:</b> \"HH24:MI') as fecha_formateada
                                   from tuits 
                                   where usuario_id::text = '$usuario_id'
@@ -120,10 +172,15 @@
   }
 
 
-  function insertar_tuit($mensaje, $usuario_id) {
+  function insertar_tuit($mensaje, $logged_id, $usuario_id) {
     $con = conectar();
-    $res = pg_query($con, "insert into tuits (usuario_id, mensaje)
-                           values ($usuario_id, '$mensaje')");
+    if ($logged_id == $usuario_id) {
+      $res = pg_query($con, "insert into tuits (usuario_id, mensaje)
+                             values ($usuario_id, '$mensaje')");
+    } else {
+      $res = pg_query($con, "insert into tuits (usuario_id, from_id, mensaje)
+                             values ($logged_id, $usuario_id, '$mensaje')");
+    }
     pg_close();
   }
 

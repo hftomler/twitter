@@ -16,7 +16,7 @@ create table tuits (
                                references usuarios (id) on delete cascade
                                on update cascade,
       from_id     bigint       constraint fk_retuit_usuarios
-                               references usuarios (id) on delete null
+                               references usuarios (id) on delete set null
                                on update cascade,
       mensaje     varchar(140) not null constraint ck_tuits_mensaje
                                check (length(mensaje) <= 140),

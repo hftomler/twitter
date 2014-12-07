@@ -8,7 +8,7 @@
                         <img class="user  img_post" src="../images/login.png" alt="Iniciar Sesión"/><?php
         } else {
          $user_id = comprobar_usuario();
-         $nick = comprobar_nick($user_id);?>
+         $nick = devolver_nick($user_id);?>
           <a style="text-decoration:none" href="../usuarios/logout.php" title="Cerrar sesión => <?= $nick ?>">
                         <img class="user img_post" src="../images/logout.png" alt="Cerrar sesión => <?= $nick ?>"/><?php          
         }?>     
