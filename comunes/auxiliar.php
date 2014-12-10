@@ -8,7 +8,8 @@
 
 // FUNCIONES RELACIONADAS CON EL USUARIO
 
-  function comprobar_usuario()
+  function comprobar_usuario() // Comprueba si existe la variable de Sesión ['usuario'] y si no existe
+                               // redirige a la página de login.
   {
     if (!isset($_SESSION['usuario'])) {
       $_SESSION['url'] = $_SERVER["REQUEST_URI"];
@@ -17,11 +18,13 @@
     return $_SESSION['usuario'];
   }
 
-  function existe_nick($nick) {
+  function existe_nick($nick) { // Devuelve verdadero si existe el nick proprocionado, falso si no existe.
     $con = conectar();
 
     $res = pg_query($con, "select id from usuarios
                            where nick = '$nick'");
+
+    pg_close();
 
     if (pg_num_rows($res) == 1) {
       return true;
@@ -30,11 +33,13 @@
     }
   }
 
-  function devolver_id($nick) {
+  function devolver_id($nick) { // Devuelve el id de un nick facilitado.
+                                // Devuelve falso si no existe ese nick.
     if (existe_nick($nick)) {
       $con = conectar();
       $res = pg_query($con, "select id from usuarios
                            where nick = '$nick'");
+      pg_close();
 
       if (pg_num_rows($res) == 1) {
         $fila = pg_fetch_assoc($res);
@@ -45,7 +50,7 @@
     }
   }
 
-  function usuario_max() {
+  function usuario_max() { // Devuelve el número de identifidor de usuario máximo.
     
     $max = 0; 
     $con = conectar();
@@ -60,7 +65,7 @@
     return $max;
   }
 
-  function usuario_min() {
+  function usuario_min() { // Devuelve el identificador de usuario mínimo
     
     $min = 1; 
     $con = conectar();
@@ -75,7 +80,7 @@
     return $min;
   }
 
-  function devolver_nick($usuario_id)
+  function devolver_nick($usuario_id) // Devuelve el nick de un identificador de usuario.
   {
     $con = conectar();
 
@@ -90,25 +95,17 @@
     return $nick;
   }
 
-  function devolver_from_nick($from_id) { // Devuelve el nick del usuario original del tuit
-    $con = conectar();
-
-    $res = pg_query($con, "select nick from usuarios where id::text = '$from_id'");
-
-    if (pg_affected_rows($res) == 1) {
-      $fila = pg_fetch_assoc($res);
-      $nick = $fila['nick'];
-    }
-
-    pg_close();
-    return $nick; 
-  }
-
   function devolver_lista_usuarios($usuario_id) { // Devuelve todos los usuarios excepto el usuario
                                                  // del que se está mostrando el timeline actualmente
     $con = conectar();
 
-    $res = pg_query($con, "select nick, id from usuarios where id::text != '$usuario_id'");
+    $res = pg_query($con, "select u.nick, u.id,
+                                (select count(t.usuario_id) as tuits
+                                 from tuits as t 
+                                 where u.id = t.usuario_id)
+                          from usuarios as u 
+                          where u.id::text != '$usuario_id'
+                          order by tuits desc");
 
     pg_close();
     return $res; 
@@ -116,7 +113,8 @@
 
 // FUNCIONES RELACIONADAS CON LOS TUITS
 
-  function contar_tuits($usuario) {
+  function contar_tuits($usuario) { // Cuenta los tuits de un usuario determinado, si la variable
+                                    // proporcionada vale 0 cuenta todos los tuits.
     $con = conectar();
     if ($usuario == 0) {
       $res = pg_query($con, "select count(*) as ntuits from tuits");  
@@ -132,7 +130,8 @@
     return $ntuits;    
   }
 
-  function devolver_tuits($usuario_id, $tpp, $pag) {
+  function devolver_tuits($usuario_id, $tpp, $pag) { // DEVUELVE LOS $tpp TUITS DE UN USUARIO ESPECIFICADOS
+                                                     // EMPEZANDO POR LA PÁGINA $pag.
     $con = conectar();
     $res = pg_query($con, "select id, mensaje, from_id, to_char(fecha, '\"<b>\"dd-mm-yyyy\"</b>
                                                <br/><b>Hora:</b> \"HH24:MI') as fecha_formateada
@@ -146,19 +145,65 @@
     return $res;
   }
 
-  function devolver_ntuits($ntuits_dev) {
-    $ntuits = contar_tuits(0);
+  function devolver_tuit($id) { // Devuelve un tuit determinado para edición.
     $con = conectar();
-    $res = pg_query($con, "select id, mensaje, from_id, to_char(fecha, '\"<b>\"dd-mm-yyyy\"</b>
-                                               <br/><b>Hora:</b> \"HH24:MI') as fecha_formateada
-                                  from tuits 
-                           order by fecha desc
-                           limit $ntuits_dev");
+    $res = pg_query($con, "select id, mensaje, to_char(fecha, 'dd-mm-yyyy\" a las \"HH24:MI:SS') as fecha_formateada
+    from tuits where id::text = '$id'");
+    if (pg_affected_rows($res) == 0) {
+      $GLOBALS['mensajes_estado']['mensaje'] = "Se ha producido un error al crear el tuit";
+      $GLOBALS['mensajes_estado']['tipo'] = "err";
+    }
+    pg_close();
+    return $res;
+  }
+
+  function devolver_ntuits($ntuits_dev, $hashtag) { 
+                            // DEVUELVE EL NÚMERO DE ntuits MÁS RECIENTES DE UN hashtag ESPECIFICADO
+                            // SI LA CADENA PASADA ESTÁ VACÍA DEVUELVE LOS ntuits MÁS RECIENTES.
+
+    if ($hashtag !="" && strlen($hashtag) >3) {
+      $hashtag = "#" . $hashtag;
+      $con = conectar();
+      $res = pg_query($con, "select id, mensaje, from_id, to_char(fecha, '\"<b>\"dd-mm-yyyy\"</b>
+                                                 <br/><b>Hora:</b> \"HH24:MI') as fecha_formateada
+                                    from tuits 
+                                    where upper(mensaje) like upper('%$hashtag%')
+                                    order by fecha desc
+                                   limit $ntuits_dev");
+    } else {
+      $con = conectar();
+      $res = pg_query($con, "select id, mensaje, from_id, to_char(fecha, '\"<b>\"dd-mm-yyyy\"</b>
+                                                 <br/><b>Hora:</b> \"HH24:MI') as fecha_formateada
+                                    from tuits 
+                                    where upper(mensaje) like upper('%$hashtag%')
+                                    order by fecha desc
+                                   limit $ntuits_dev");
+    }
     pg_close();
 
     return $res;
   }
 
+  function buscar_hashtags() {
+    $con = conectar();
+    $res = pg_query($con, "select unnest(string_to_array(mensaje, ' ')) as x, id from tuits;");
+    $car_eli = array(".", ",", ";", ":", "-", "?", "¿", "!", "¡", "=", "#"); 
+
+    for ($i=0; $i < pg_affected_rows($res); $i++) { // EXTRAIGO LOS HASHTAGS DE LOS MENSAJES
+        $fila = pg_fetch_assoc($res, $i);
+        extract($fila);
+        if (substr($x, 0, 1) == '#') {
+          $x = str_replace($car_eli, "", $x); // LIMPIO LOS HASHTAGS DE CARACTERES INSERVIBLES INCLUIDO LA #
+          $x = strtoupper($x);                // CONVIERTO TODOOS LOS HASHTAGS A MAYÚSCULAS
+          if (isset($hash_array["$x"])) {
+            $hash_array["$x"] += 1;
+          } else {
+            $hash_array["$x"] = 1;
+          }
+        }
+    }
+    return $hash_array;
+  }
 
   function insertar_tuit($mensaje, $logged_id, $usuario_id) {
     $con = conectar();
@@ -169,6 +214,14 @@
       $res = pg_query($con, "insert into tuits (usuario_id, from_id, mensaje)
                              values ($logged_id, $usuario_id, '$mensaje')");
     }
+
+    if (pg_affected_rows($res) > 0) {
+      $GLOBALS['mensajes_estado']['mensaje'] = "El tuit se ha creado de forma correcta";
+      $GLOBALS['mensajes_estado']['tipo'] = "ok";
+    } else {
+      $GLOBALS['mensajes_estado']['mensaje'] = "Se ha producido un error al crear el tuit";
+      $GLOBALS['mensajes_estado']['tipo'] = "err";
+    }
     pg_close();
   }
 
@@ -177,24 +230,34 @@
       if (comprobar_tuit($tuit_id)) {
         $con = conectar();
         $res = pg_query($con, "delete from tuits where id::text = '$tuit_id'");
-        pg_close();
+        if (pg_affected_rows($res) > 0) {
+          $GLOBALS['mensajes_estado']['mensaje'] = "El tuit se ha borrado de forma correcta";
+          $GLOBALS['mensajes_estado']['tipo'] = "ok";
+        } else {
+          $GLOBALS['mensajes_estado']['mensaje'] = "Se ha producido un error al borrar el tuit";
+          $GLOBALS['mensajes_estado']['tipo'] = "err";
+        }
       } else {
-        return "No existe ningún tuit con id $tuit_id";
+          $GLOBALS['mensajes_estado']['mensaje'] = "No existe ningún tuit con ese ID.";
+          $GLOBALS['mensajes_estado']['tipo'] = "err";
       }
+    pg_close();
   }
 
   function modificar_tuit($tuit_id, $mensaje) {
 
       if (comprobar_tuit($tuit_id)) {
         $con = conectar();
-        $res = pg_query($con, "update tuits set mensaje='$mensaje', fecha = current_timestamp where id::text = '$tuit_id'");
-        pg_close();
+        $res = pg_query($con, "update tuits set mensaje='$mensaje', fecha = current_timestamp 
+                               where id::text = '$tuit_id'");
       } else {
-        return "No existe ningún tuit con id $tuit_id";
+          $GLOBALS['mensajes_estado']['mensaje'] = "No existe ningún tuit con ese ID.";
+          $GLOBALS['mensajes_estado']['tipo'] = "err";
       }
+      pg_close();
   }
 
-  function comprobar_tuit($tuit_id) {
+  function comprobar_tuit($tuit_id) { // comprueba si un tuit existe por su identificador
 
     $con = conectar();
     $res = pg_query($con, "select * from tuits where id::text = '$tuit_id'");
@@ -204,6 +267,15 @@
       return true;
     } else {
       return false;
+    }
+  }
+
+
+  // GENERAL
+
+  function hay_mensajes() {
+    if (empty($GLOBALS['mensajes_estado']['mensaje'])) {
+      echo 'hidden';
     }
   }
 

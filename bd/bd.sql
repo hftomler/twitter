@@ -8,6 +8,20 @@ create table usuarios (
       password char(32)    not null constraint ck_password_valida
                            check (length(password) = 32));
 
+-- FOLLOWERS
+
+drop table if exists followers cascade;
+
+create table followers (
+      id_fr    bigint   not null    constraint fk_followers_usuarios_fr
+                                    references usuarios(id) on delete cascade
+                                    on update cascade,
+      id_fd    bigint   not null    constraint fk_followers_usuarios_fd
+                                    references usuarios(id) on delete cascade
+                                    on update cascade,
+      CONSTRAINT ck_fr_distinto_fd  CHECK (id_fr != id_fd));
+
+
 -- TUITS:
 drop table if exists tuits cascade;
 create table tuits (

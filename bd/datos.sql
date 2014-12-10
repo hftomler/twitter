@@ -30,3 +30,19 @@
                                 (4, 'Aquí no escribe nadie más, a ver si se anima la cosa', '2014-12-02 21:59:27.435856'),
                                 (3, 'Al final me compraré la Nikon 5200', '2014-10-22 10:59:27.435856'),
                                 (3, 'A ver si podemos alquilar una casa en navidades', '2014-12-02 20:59:27.435856');
+
+-- FOLLOWERS --
+
+    insert into followers (id_fr, id_fd) values (1, 1);
+    insert into followers (id_fr, id_fd) values (1, 2);
+    insert into followers (id_fr, id_fd) values (1, 3);
+    insert into followers (id_fr, id_fd) values (1, 4);
+    insert into followers (id_fr, id_fd) values (1, 5);
+    insert into followers (id_fr, id_fd) values (2, 1);
+    insert into followers (id_fr, id_fd) values (3, 2);
+    insert into followers (id_fr, id_fd) values (4, 1);
+    insert into followers (id_fr, id_fd) values (5, 1);
+    insert into followers (id_fr, id_fd) values (5, 3);
+    insert into followers (id_fr, id_fd) values (4, 2);
+    insert into followers (id_fr, id_fd) values (3, 5);
+    insert into followers (id_fr, id_fd) values (4, 3);

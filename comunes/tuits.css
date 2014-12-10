@@ -10,11 +10,10 @@ body {
   position: relative;
   width: 960px;
   margin: 5px auto;
-  border: 1px solid black;
   background-color: white;
 }
 
-header, section, aside, footer, .res1, .res2 {
+header, section, aside, footer, .res1, .res2, .mensaje_error {
   float: left;
   border: 1px solid #960;
   border-radius: 5px 5px;
@@ -29,7 +28,7 @@ header {
   margin: 5px auto;
   padding: 0px 5px 0 5px;
   text-align: right;
-  background-image: url("../images/header.png");
+  background-image: url("../images/header.jpg");
 }
 
 .login {
@@ -85,12 +84,21 @@ header {
 
 section {
   position: relative;
-  width: 624px;
+  width: 574px;
   min-height: 450px;
   margin: 5px 10px;
   padding: 5px;
   text-align: center;
   background: #fff url("../images/watermark.png") no-repeat center center;
+}
+
+.mensaje_error {
+  width: 950px;
+  height: 30px;
+  min-height: 40px;
+  margin: 10px 0px;
+  text-align: center;
+  background-image: none;
 }
 
 .res1, .res2 {
@@ -123,7 +131,7 @@ aside {
 }
 
 #bloque_derecho {
-  width: 99px;
+  width: 149px;
   min-height: 450px;
   margin: 5px 0;
   padding: 5px;
@@ -260,6 +268,17 @@ input.pg_anterior {
 
 /* FIN INPUT LOGIN */
 
+.hashtag {
+  width: 114px;
+  height: 30px;
+  margin: 10px 0;
+  padding: 0 0 0 25px;
+  text-align: left;
+  vertical-align: middle;
+  font: normal bold 1.0em  arial, sans-serif;
+  background: #fff url("../images/filtro_hashtag_green.png") left center no-repeat;
+  border: #aaa 3px ridge;
+}
 
 /* FORMATOS DE PÁRRAFO */
 
@@ -267,7 +286,7 @@ input.pg_anterior {
 .titulo {
   text-align: center;
   color: #06c;
-  font: bold 1.2em verdana, sans-serif;
+  font: bold verdana, sans-serif;
   text-decoration: underline;
 }
 
@@ -296,10 +315,28 @@ input.pg_anterior {
   font-weight: bold;
 }
 
+.resaltar_claro {
+  color: #aaf;
+  font-weight: bold;
+}
+
 .numero_tuits {
   color: orange;
   font-style: oblique;
-  font-size: 0.6em;
+  font-size: 0.8em;
+}
+
+
+.hashtag_leyenda {
+  font-size: 0.8em;
+  color: blue;
+  font-weight: bold;
+}
+
+.numero_rep_hashtags {
+  color: orange;
+  font-style: oblique;
+  font-size: 0.9em;
 }
 
 .copyright {
@@ -314,6 +351,32 @@ footer p {
   text-align: center;
   font-size: 0.6em;
   font-weight: 200;
+}
+
+.ok::before {
+  content: "OK:";
+  background-color: #00f;
+  color: #fff;
+}
+
+.ok {
+  color: #00f;
+  text-align: center;
+  font-size: 1.5em;
+  font-weight: 150;
+}
+
+.err::before {
+  content: "ERROR:";
+  background-color: #f00;
+  color: #fff;
+}
+
+.err {
+  color: #f00;
+  text-align: center;
+  font-size: 1.5em;
+  font-weight: 150;
 }
 
 
