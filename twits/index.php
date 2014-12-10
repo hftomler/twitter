@@ -11,6 +11,8 @@
     
     // Define la variable global para los mensajes de estado.
     $GLOBALS['mensajes_estado'] = ["mensaje" => "", "tipo" => 'err'];
+    $tpp = 5;                          // Tuits por página
+
      // Recibe el usuario logueado o redirige a login.
  
       if (isset($_SESSION['usuario'])) {
@@ -56,18 +58,7 @@
       <aside>
       <article>
         <h3 class="titulo">Logged User</h3>
-        <div class="leyenda">
-          Usuario:
-        </div>
-        <div class="dato">
-          <?= $logged_id ?>
-        </div>
-        <div class="leyenda">
-          Nick:
-        </div>
-        <div class="dato">
-          <?= $nick ?>
-        </div>
+        <p><span class="leyenda">Usuario:</span> <?= $nick ?></p>
           <form action="index.php" method="POST">
             <input type="hidden" name="usuario_id" value="<?= $usuario_id ?>">
             <textarea class="enviar_msj" name="insertar_tuit" rows="7" cols="22" 
@@ -75,17 +66,25 @@
             required="required"><?= $mensaje ?></textarea>
             <input type="image" src="../images/enviar_normal.png" value="Enviar" title="Enviar tuit">
           </form>
-          <br />
       </article>
       <article>
         <img src="../images/divider.png" />
-        <h3 class="titulo">¿Qué poner?</h3>
+        <h3 class="titulo">Top Follow Users</h3><?php
+        $lista_usuarios = devolver_lista_usuarios($usuario_id, 'nick', true);
+        if (pg_affected_rows($lista_usuarios) >0) {
+          for ($i = 0; $i < $tpp; $i++) {
+            $fila = pg_fetch_assoc($lista_usuarios, $i);
+            extract($fila);?>
+            <span class="resaltar">
+              @<a href="index.php?ouser_id=<?= $id ?>&ver_user" title="Seguidores de <?= $nick ?>"><?= $nick ?>
+            <span class="numero_tuits">(<?= $nfollowers ?>)</span></a></span><br/><?php
+          }
+        }?>
       </article>
       </aside>
       <section><?php
         if ($usuario_id !='' && (!isset($_POST['editar_msj']))) {
           $ttot = contar_tuits($usuario_id); // Tuits totales del usuario
-          $tpp = 5;                          // Tuits por página
           $nenlaces = 2;                     // Número de enlaces a cada lado de la página actual
           if ($ttot > 0) {
             $npag = ceil($ttot/$tpp);
@@ -167,7 +166,7 @@
       </section>
       <aside id="bloque_derecho">
         <h3 class="titulo">Top 5 Users</h3><?php
-        $lista_usuarios = devolver_lista_usuarios($usuario_id);
+        $lista_usuarios = devolver_lista_usuarios($usuario_id, 'tuits', false);
         if (pg_affected_rows($lista_usuarios) >0) {
           for ($i = 0; $i < $tpp; $i++) {
             $fila = pg_fetch_assoc($lista_usuarios, $i);
@@ -190,7 +189,7 @@
           }
           $cont -= 1;?>
           <span class="hashtag_leyenda">
-            #<a href="index.php?hashtag=<?= $hashtags_array[$key] ?>&ouser_id=<?= $usuario_id ?>"
+            #<a href="index.php?hashtag=<?= $key ?>&ouser_id=<?= $usuario_id ?>"
                title="Ver tuits hashtag -> <?= $hashtags_array[$key] ?>"><?= $key ?>
                <span class="numero_rep_hashtags">(<?= $hashtags_array[$key] ?>)</span>
            </span></a><br/><?php

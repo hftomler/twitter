@@ -109,10 +109,12 @@ section {
 
 .res1 {
   margin: 5px 0;
+  min-height: 400px;
 }
 
 .res2 {
   margin: 5px 0 5px 10px;
+  min-height: 400px;
 }
 
 .cont_paginacion {
@@ -180,8 +182,8 @@ form.pag {
 
 .leyenda {
   float: left;
-  width: 50px;
-  margin: 5px 5px;
+  width: 30px;
+  margin-left: 10px;
   color: #960 ;
   text-align: left;
 }
@@ -427,6 +429,7 @@ footer p {
 
   td.fecha {
     max-width:16%;
+    font-size: 0.8em;
   }
 
   td.accion {

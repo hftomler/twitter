@@ -95,18 +95,27 @@
     return $nick;
   }
 
-  function devolver_lista_usuarios($usuario_id) { // Devuelve todos los usuarios excepto el usuario
-                                                 // del que se está mostrando el timeline actualmente
-    $con = conectar();
+  function devolver_lista_usuarios($usuario_id, $order_column, $follow) { 
+        /* Devuelve todos los usuarios excepto el usuario indicado. La variable $follow es booleana
+        e indica si lo que se devuelve es los seguidores (true) o los tuits(false) de cada usuario.*/
+  $con = conectar();
+  if (!$follow) { 
 
-    $res = pg_query($con, "select u.nick, u.id,
-                                (select count(t.usuario_id) as tuits
-                                 from tuits as t 
-                                 where u.id = t.usuario_id)
+    $res = pg_query($con, "select u.nick as nick, u.id as id,
+                                  (select count(t.usuario_id) as tuits
+                                   from tuits as t 
+                                   where u.id = t.usuario_id)
                           from usuarios as u 
                           where u.id::text != '$usuario_id'
-                          order by tuits desc");
-
+                          order by $order_column desc");
+  } else {
+    $res = pg_query($con, "select u.nick as nick, u.id,
+                                 (select count(f.id_fd) as nfollowers
+                                 from followers f 
+                                 where u.id = f.id_fd)
+                          from usuarios as u
+                          order by nfollowers desc, $order_column asc;");
+  }
     pg_close();
     return $res; 
   }
@@ -129,6 +138,20 @@
 
     return $ntuits;    
   }
+
+  function contar_followers($usuario) { // Cuenta los followers de un usuario determinado.
+
+    $con = conectar();
+    $res = pg_query($con, "select count(*) as nfollowers from followers where id_fd::text = '$usuario'");
+    if (pg_affected_rows($res) == 1) {
+      $fila = pg_fetch_assoc($res);
+      $nfollowers = $fila['nfollowers'];
+    }
+    pg_close();
+
+    return $nfollowers;
+  }
+
 
   function devolver_tuits($usuario_id, $tpp, $pag) { // DEVUELVE LOS $tpp TUITS DE UN USUARIO ESPECIFICADOS
                                                      // EMPEZANDO POR LA PÁGINA $pag.
@@ -159,7 +182,7 @@
 
   function devolver_ntuits($ntuits_dev, $hashtag) { 
                             // DEVUELVE EL NÚMERO DE ntuits MÁS RECIENTES DE UN hashtag ESPECIFICADO
-                            // SI LA CADENA PASADA ESTÁ VACÍA DEVUELVE LOS ntuits MÁS RECIENTES.
+                            // SI EL hashtag ES UNA CADENA VACÍA DEVUELVE LOS ntuits MÁS RECIENTES.
 
     if ($hashtag !="" && strlen($hashtag) >3) {
       $hashtag = "#" . $hashtag;

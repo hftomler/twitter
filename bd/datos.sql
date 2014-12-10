@@ -33,7 +33,6 @@
 
 -- FOLLOWERS --
 
-    insert into followers (id_fr, id_fd) values (1, 1);
     insert into followers (id_fr, id_fd) values (1, 2);
     insert into followers (id_fr, id_fd) values (1, 3);
     insert into followers (id_fr, id_fd) values (1, 4);
@@ -46,3 +45,5 @@
     insert into followers (id_fr, id_fd) values (4, 2);
     insert into followers (id_fr, id_fd) values (3, 5);
     insert into followers (id_fr, id_fd) values (4, 3);
+    insert into followers (id_fr, id_fd) values (6, 3);
+    insert into followers (id_fr, id_fd) values (3, 6);

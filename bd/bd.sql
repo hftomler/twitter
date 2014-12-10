@@ -19,7 +19,8 @@ create table followers (
       id_fd    bigint   not null    constraint fk_followers_usuarios_fd
                                     references usuarios(id) on delete cascade
                                     on update cascade,
-      CONSTRAINT ck_fr_distinto_fd  CHECK (id_fr != id_fd));
+      CONSTRAINT ck_fr_distinto_fd  CHECK (id_fr != id_fd))
+      CONSTRAINT pk_followers PRIMARY KEY (id_fr, id_fd);
 
 
 -- TUITS:
